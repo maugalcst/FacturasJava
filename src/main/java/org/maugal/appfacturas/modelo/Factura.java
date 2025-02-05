@@ -1,5 +1,6 @@
 package org.maugal.appfacturas.modelo;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Factura {
@@ -57,5 +58,50 @@ public class Factura {
         if (indiceItems < MAX_ITEMS) {
             this.items[indiceItems++] = item;
         }
+    }
+
+    public float calcularTotal() {
+        float total = 0.0f;
+        for (ItemFactura item : this.items) {
+            if (item == null) {
+                continue;
+            }
+            total += item.calcularImporte();
+        }
+        return total;
+    }
+
+    public String generarDetalle() {
+        StringBuilder sb = new StringBuilder("Factura N: ");
+        sb.append(folio)
+                .append("\nCliente: " + this.cliente.getNombre())
+                .append("\tNIF: " + this.cliente.getNif())
+                .append("\nDescripcion: " + this.descripcion)
+                .append("\n")
+                .append("\n#\tNombre\t$\tCant.\tTotal\n");
+
+        SimpleDateFormat df = new SimpleDateFormat("dd 'de' MMMM, yyyy");
+        sb.append("Fecha emisión: ").append(df.format(this.fecha))
+                .append("\n");
+
+        for (ItemFactura item : this.items) {
+            if (item == null) {
+                continue;
+            }
+            sb.append(item.getProducto().getCodigo())
+                    .append("\t")
+                    .append(item.getProducto().getNombre())
+                    .append("\t")
+                    .append(item.getProducto().getPrecio())
+                    .append("\t")
+                    .append(item.getCantidad())
+                    .append("\t")
+                    .append(item.calcularImporte())
+                    .append("\n");
+        }
+
+        sb.append("Gran Total: ").append(calcularTotal());
+
+        return sb.toString();
     }
 }
